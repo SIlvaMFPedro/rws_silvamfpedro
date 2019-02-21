@@ -163,10 +163,10 @@ int main(int argc, char** argv){
 //
 //    red_team.checkTeamInfo("psilva5");
 
-    ros::init(argc, argv, "player_silvamfpedro");
+    ros::init(argc, argv, "player_psilva");
     ros::NodeHandle nh;
 
-    rws_silvamfpedro::MyPlayer player("silvamfpedro", "blue");
+    rws_silvamfpedro::MyPlayer player("psilva", "blue");
     cout << "Hello World from " << player.player_name << " of team " << player.getTeamName() << endl;
 //    rws_silvamfpedro::Team blue_team("blue");
 //    rws_silvamfpedro::Team green_team("green");
