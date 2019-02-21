@@ -1,22 +1,24 @@
 #include <iostream>
 #include <ros/ros.h>
 
+using namespace std;
+
 class Player{
 public:
     //properties
-    std::string player_name;
+    string player_name;
 
-    Player(std::string player_name_in){ //constructor
+    Player(string player_name_in){ //constructor
         player_name = player_name_in;
         team_name = "";
     }
 
-    void setTeamName(std::string team_name_in){
+    void setTeamName(string team_name_in){
         if(team_name_in == "red" || team_name_in == "blue" || team_name_in == "green"){
             team_name = team_name_in;
         }
         else{
-            std::cout << "Invalid team name" << team_name_in << std::endl;
+            cout << "Invalid team name" << team_name_in << endl;
             team_name = "";
         }
     }
@@ -46,6 +48,15 @@ private:
 
 };
 
+class MyPlayer : public Player
+{
+public:
+    MyPlayer(string player_name_in, string team_name_in) : Player(player_name_in){
+        setTeamName(team_name_in);
+    }
+private:
+};
+
 int main(int argc, char** argv){
     //ros::init(argc, argv, "player_psilva");
     //ros::NodeHandle n;
@@ -53,12 +64,15 @@ int main(int argc, char** argv){
     //for(int i = 0; i < 10; i++){
     //    std::cout << i << std::endl;
     //}
-    std::cout << "Hello World" << std::endl;
+    cout << "Hello World" << endl;
     Player player("psilva");
-    std::cout << "Hello World from psilva" << std::endl;
+    cout << "Hello World from psilva" << endl;
     player.setTeamName("blue");
-    std::cout << "Hello World from psilva of team " << player.getTeamName() << std::endl;
+    cout << "Hello World from psilva of team " << player.getTeamName() << endl;
     player.setTeamName(0);
-    std::cout << "Hello World from psilva of team " << player.getTeamName() << std::endl;
+    cout << "Hello World from psilva of team " << player.getTeamName() << endl;
+
+    MyPlayer my_player("silvamfpedro", "blue");
+    cout << "Hello world from " << my_player.player_name << " of team " << my_player.getTeamName() << endl;
     return 1;
 }
