@@ -145,7 +145,6 @@ int main(int argc, char** argv){
     rws_silvamfpedro::Team green_team("green");
 
     //Create ROS Subscriber
-
     Subscriber sub = nh.subscribe("/make_a_play", 100, &rws_silvamfpedro::MyPlayer::makeAPlayCallBack, &player);
 
     while(ros::ok()){
