@@ -73,7 +73,20 @@ namespace rws_silvamfpedro {
                 cout << player_names.at(i) << endl;
             }
         }
+        void checkTeamInfo(string player_name){
+            cout << player_name << " belongs to red team: " << playerBelongsToTeam(player_name) << endl;
+        }
     private:
+        bool playerBelongsToTeam(string player_name){
+            bool teamplayer = false;
+            for(size_t i = 0; i < player_names.size(); i++){
+                if(player_names.at(i) == player_name) {
+                    teamplayer = true;
+                    break;
+                }
+            }
+            return teamplayer;
+        }
 
     };
 };
@@ -102,9 +115,10 @@ int main(int argc, char** argv){
     red_team.player_names.emplace_back("psilva3");
     red_team.player_names.emplace_back("psilva4");
 
+    red_team.checkTeamInfo("psilva5");
 
 
-    red_team.printTeamInfo();
+
 
     return 1;
 }
