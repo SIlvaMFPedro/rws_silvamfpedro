@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include <ros/ros.h>
 
 using namespace std;
@@ -58,6 +59,23 @@ namespace rws_silvamfpedro {
 
     private:
     };
+
+    class Team{
+    public:
+        string team_name;
+        vector<string> player_names;
+        Team(string team_name_in){ //constructor
+            team_name = team_name_in;
+        }
+        void printTeamInfo(){
+            cout << "Team " << team_name << " has players: " << endl;
+            for(size_t i = 0; i < player_names.size(); i++){
+                cout << player_names.at(i) << endl;
+            }
+        }
+    private:
+
+    };
 };
 
 int main(int argc, char** argv){
@@ -77,5 +95,16 @@ int main(int argc, char** argv){
 
     rws_silvamfpedro::MyPlayer my_player("silvamfpedro", "blue");
     cout << "Hello world from " << my_player.player_name << " of team " << my_player.getTeamName() << endl;
+
+    rws_silvamfpedro::Team red_team("red");
+    red_team.player_names.emplace_back("psilva1");
+    red_team.player_names.emplace_back("psilva2");
+    red_team.player_names.emplace_back("psilva3");
+    red_team.player_names.emplace_back("psilva4");
+
+
+
+    red_team.printTeamInfo();
+
     return 1;
 }
