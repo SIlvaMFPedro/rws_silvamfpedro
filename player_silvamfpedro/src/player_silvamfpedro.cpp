@@ -10,9 +10,14 @@ using namespace std;
 using namespace boost;
 using namespace ros;
 
-float randomizePosition()
+float randomizePosition1()
 {
     srand(6526*time(NULL)); // set initial seed value to 5323
+    return (((double)rand() / (RAND_MAX)) - 0.5) * 10;
+}
+float randomizePosition2()
+{
+    srand(3213*time(NULL)); // set initial seed value to 5323
     return (((double)rand() / (RAND_MAX)) - 0.5) * 10;
 }
 
@@ -129,8 +134,8 @@ namespace rws_silvamfpedro {
                 //printInfo();
 
                 //define intial position
-                float sx = randomizePosition();
-                float sy = randomizePosition();
+                float sx = randomizePosition1();
+                float sy = randomizePosition2();
                 tf::Transform T1;
                 T1.setOrigin( tf::Vector3(sx/2, sy/2, 0.0) );
                 tf::Quaternion q;
