@@ -2,6 +2,8 @@
 #include <vector>
 #include <ros/ros.h>
 #include <rws2019_msgs/MakeAPlay.h>
+#include <tf/transform_broadcaster.h>
+
 
 using namespace std;
 using namespace boost;
@@ -117,6 +119,13 @@ namespace rws_silvamfpedro {
             }
             void makeAPlayCallBack(rws2019_msgs::MakeAPlayConstPtr msg){
                 ROS_INFO("Received a new ROS message");
+                //public transform
+                tf::Transform transform1;
+                transform1.setOrigin( tf::Vector3(5,5,0.0) );
+                tf::Quaternion q;
+                q.setRPY(0, 0, 0);
+                transform1.setRotation(q);
+                tb.sendTransform(tf::StampedTransform(transform1, ros::Time::now(), "world", this->getPlayerName()));
             }
 
         private:
@@ -127,6 +136,8 @@ namespace rws_silvamfpedro {
             boost::shared_ptr<Team> team_mine;
             boost::shared_ptr<Team> team_hunters;
             boost::shared_ptr<Team> team_preys;
+            tf::TransformBroadcaster tb;
+            tf::Transform transform;
     };
 
 
