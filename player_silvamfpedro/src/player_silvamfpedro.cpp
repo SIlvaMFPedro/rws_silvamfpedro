@@ -194,8 +194,8 @@ namespace rws_silvamfpedro {
                 float distance_closest_prey = 1000;
                 for(size_t i = 0; i  < distance_to_preys.size(); i++){
                     if(distance_to_preys[i] < distance_closest_prey){
-                        idx_closest_prey = 1;
-                        distance_closest_prey = distance_to_preys[1];
+                        idx_closest_prey = i;
+                        distance_closest_prey = distance_to_preys[i];
                     }
                 }
 
