@@ -179,6 +179,9 @@ namespace rws_silvamfpedro {
                 vector<float> distance_to_preys;
                 vector<float> angle_to_preys;
 
+                vector<float> distance_to_hunters;
+                vector<float> angle_to_hunters;
+
                 //For each prey find the closest. Then follow it
                 for (size_t i =0; i< team_preys->getPlayerNames().size(); i++)
                 {
@@ -188,14 +191,23 @@ namespace rws_silvamfpedro {
                     angle_to_preys.push_back(std::get<1>(tuple));
 
                 }
+                //For each hunter find the closest. Then run away
+                for (size_t i = 0; i < team_hunters->getPlayerNames().size(); i++){
+                    ROS_WARN_STREAM("team_hunters = " << team_hunters->getPlayerNames().at(i));
+                    std::tuple<float, float> tuple = getDistanceAndAngleToPlayer(team_hunters->getPlayerNames().at(i));
+                    distance_to_preys.push_back(std::get<0>(tuple));
+                    angle_to_preys.push_back(std::get<1>(tuple));
+                }
 
                 //Compute closest prey
                 int idx_closest_prey = 0;
                 float distance_closest_prey = 1000;
-                for(size_t i = 0; i  < distance_to_preys.size(); i++){
-                    if(distance_to_preys[i] < distance_closest_prey){
-                        idx_closest_prey = i;
-                        distance_closest_prey = distance_to_preys[i];
+                for(size_t i = 0; i  < distance_to_preys.size(); i++) {
+                    if (distance_to_preys[i] < distance_to_hunters[i]) {
+                        if (distance_to_preys[i] < distance_closest_prey) {
+                            idx_closest_prey = i;
+                            distance_closest_prey = distance_to_preys[i];
+                        }
                     }
                 }
 
