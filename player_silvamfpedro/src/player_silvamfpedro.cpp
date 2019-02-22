@@ -12,7 +12,7 @@ using namespace ros;
 
 float randomizePosition()
 {
-    srand(9863*time(NULL)); // set initial seed value to 5323
+    srand(6526*time(NULL)); // set initial seed value to 5323
     return (((double)rand() / (RAND_MAX)) - 0.5) * 10;
 }
 
@@ -123,7 +123,7 @@ namespace rws_silvamfpedro {
                 float sx = randomizePosition();
                 float sy = randomizePosition();
                 tf::Transform T1;
-                T1.setOrigin( tf::Vector3(sx, sy, 0.0) );
+                T1.setOrigin( tf::Vector3(sx/2, sy/2, 0.0) );
                 tf::Quaternion q;
                 q.setRPY(0, 0, M_PI);
                 T1.setRotation(q);
@@ -131,6 +131,8 @@ namespace rws_silvamfpedro {
                 //define global movement
                 tf::Transform Tglobal = T1;
                 tb.sendTransform(tf::StampedTransform(Tglobal, ros::Time::now(), "world", this->getPlayerName()));
+
+                ros::Duration(0.1).sleep();
                 printInfo();
             }
             void printInfo(){
@@ -152,7 +154,7 @@ namespace rws_silvamfpedro {
                 }
 
                 //STEP 2: define how I want to move
-                float dx = 2.5;
+                float dx = 1.25;
                 float angle = M_PI/6;
 
                 //STEP 3: define local movement
