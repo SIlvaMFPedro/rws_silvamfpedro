@@ -2,12 +2,19 @@
 #include <vector>
 #include <ros/ros.h>
 #include <rws2019_msgs/MakeAPlay.h>
+#include <tf/transform_listener.h>
 #include <tf/transform_broadcaster.h>
 
 
 using namespace std;
 using namespace boost;
 using namespace ros;
+
+float randomizePosition()
+{
+    srand(9863*time(NULL)); // set initial seed value to 5323
+    return (((double)rand() / (RAND_MAX)) - 0.5) * 10;
+}
 
 namespace rws_silvamfpedro {
     class Team{
@@ -111,6 +118,20 @@ namespace rws_silvamfpedro {
                 }
                 setTeamName(team_mine->getName());
                 //printInfo();
+
+                //define intial position
+                float sx = randomizePosition();
+                float sy = randomizePosition();
+                tf::Transform T1;
+                T1.setOrigin( tf::Vector3(sx, sy, 0.0) );
+                tf::Quaternion q;
+                q.setRPY(0, 0, M_PI);
+                T1.setRotation(q);
+
+                //define global movement
+                tf::Transform Tglobal = T1;
+                tb.sendTransform(tf::StampedTransform(Tglobal, ros::Time::now(), "world", this->getPlayerName()));
+                printInfo();
             }
             void printInfo(){
                 ROS_INFO_STREAM("My name is " << this->getPlayerName() << " and my team is " << this->getTeamName());
@@ -119,13 +140,31 @@ namespace rws_silvamfpedro {
             }
             void makeAPlayCallBack(rws2019_msgs::MakeAPlayConstPtr msg){
                 ROS_INFO("Received a new ROS message");
-                //public transform
-                tf::Transform transform1;
-                transform1.setOrigin( tf::Vector3(5,5,0.0) );
+
+                //STEP 1: Find out where I am
+                tf::StampedTransform T0;
+                try{
+                    tl.lookupTransform("/world", this->getPlayerName(), ros::Time(0), T0);
+                }
+                catch (tf::TransformException ex){
+                    ROS_ERROR("%s",ex.what());
+                    ros::Duration(0.1).sleep();
+                }
+
+                //STEP 2: define how I want to move
+                float dx = 2.5;
+                float angle = M_PI/6;
+
+                //STEP 3: define local movement
+                tf::Transform T1;
+                T1.setOrigin( tf::Vector3(dx, 0.0, 0.0) );
                 tf::Quaternion q;
-                q.setRPY(0, 0, 0);
-                transform1.setRotation(q);
-                tb.sendTransform(tf::StampedTransform(transform1, ros::Time::now(), "world", this->getPlayerName()));
+                q.setRPY(0, 0, angle);
+                T1.setRotation(q);
+
+                //STEP 4: define global movement
+                tf::Transform Tglobal = T0*T1;
+                tb.sendTransform(tf::StampedTransform(Tglobal, ros::Time::now(), "world", this->getPlayerName()));
             }
 
         private:
@@ -137,6 +176,7 @@ namespace rws_silvamfpedro {
             boost::shared_ptr<Team> team_hunters;
             boost::shared_ptr<Team> team_preys;
             tf::TransformBroadcaster tb;
+            tf::TransformListener tl;
             tf::Transform transform;
     };
 
@@ -158,8 +198,9 @@ int main(int argc, char** argv){
     //Create ROS Subscriber
     Subscriber sub = nh.subscribe("/make_a_play", 100, &rws_silvamfpedro::MyPlayer::makeAPlayCallBack, &player);
 
+    ros::Rate r(20);
     while(ros::ok()){
-        ros::Duration(1).sleep();
+        //ros::Duration(1).sleep();
         player.printInfo();
         spinOnce();
     }
