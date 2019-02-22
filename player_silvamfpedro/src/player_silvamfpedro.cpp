@@ -104,6 +104,8 @@ namespace rws_silvamfpedro {
                 NodeHandle n;
                 vis_pub = (boost::shared_ptr<Publisher>) new Publisher;
                 (*vis_pub) = n.advertise<visualization_msgs::Marker>("player_names", 0);
+                bocas_pub = (boost::shared_ptr<ros::Publisher>) new ros::Publisher;
+                *bocas_pub = n.advertise<visualization_msgs::Marker>("bocas", 0);
                 //create hunter teams
                 if (team_red->playerBelongsToTeam(player_name)){
                     team_mine = team_red;
@@ -163,6 +165,9 @@ namespace rws_silvamfpedro {
                 float a = atan2(T0.getOrigin().y(), T0.getOrigin().x());
                 return {d, a};
             }
+            std::tuple<float, float> getDistanceAndAngleToWorld(){
+                return getDistanceAndAngleToPlayer("world");
+            }
             void makeAPlayCallBack(rws2019_msgs::MakeAPlayConstPtr msg){
                 ROS_INFO("Received a new ROS message");
 
@@ -201,31 +206,32 @@ namespace rws_silvamfpedro {
 
                 //Compute closest prey and closest hunter;
                 int idx_closest_prey = 0;
-                int idx_closest_hunter = 0;
                 float distance_closest_prey = 1000;
-                float distance_closest_hunter = 1000;
                 for(size_t i = 0; i  < distance_to_preys.size(); i++) {
-                    if (distance_to_preys[i] <= distance_to_hunters[i]) {
-                        if (distance_to_preys[i] < distance_closest_prey) {
+                    if (distance_to_preys[i] < distance_closest_prey) {
                             idx_closest_prey = i;
                             distance_closest_prey = distance_to_preys[i];
-                        }
-                    }
-                    else{
-                        idx_closest_hunter = i;
-                        distance_closest_hunter = distance_to_hunters[i];
                     }
                 }
 
                 //STEP 2: define how I want to move
-                float dx = 0.2;
-                float angle = M_PI/30;
-                if(distance_closest_prey <= distance_closest_hunter){
-                    angle = angle_to_preys[idx_closest_prey];
+                float dx = 10;
+                float angle = angle_to_preys[idx_closest_prey];
+                string prey = team_preys->getPlayerNames().at(idx_closest_prey);
+
+                float distance_to_arena_center;
+                float angle_to_arena_center;
+
+                // get arena center coordinates
+                std::tuple<float, float> t = getDistanceAndAngleToWorld();
+                distance_to_arena_center = std::get<0>(t);
+                angle_to_arena_center = std::get<1>(t);
+
+                if (distance_to_arena_center > 7)
+                {
+                    angle = angle * M_PI/30;
                 }
-                else{
-                    angle = angle - angle_to_hunters[idx_closest_hunter];
-                }
+
 //                float angle = angle_to_preys[idx_closest_prey];
 
 
@@ -285,6 +291,7 @@ namespace rws_silvamfpedro {
             tf::TransformBroadcaster tb;
             tf::TransformListener tl;
             boost::shared_ptr<Publisher> vis_pub;
+            boost::shared_ptr<Publisher> bocas_pub;
     };
 
 
