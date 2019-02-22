@@ -195,25 +195,38 @@ namespace rws_silvamfpedro {
                 for (size_t i = 0; i < team_hunters->getPlayerNames().size(); i++){
                     ROS_WARN_STREAM("team_hunters = " << team_hunters->getPlayerNames().at(i));
                     std::tuple<float, float> tuple = getDistanceAndAngleToPlayer(team_hunters->getPlayerNames().at(i));
-                    distance_to_preys.push_back(std::get<0>(tuple));
-                    angle_to_preys.push_back(std::get<1>(tuple));
+                    distance_to_hunters.push_back(std::get<0>(tuple));
+                    angle_to_hunters.push_back(std::get<1>(tuple));
                 }
 
-                //Compute closest prey
+                //Compute closest prey and closest hunter;
                 int idx_closest_prey = 0;
+                int idx_closest_hunter = 0;
                 float distance_closest_prey = 1000;
+                float distance_closest_hunter = 1000;
                 for(size_t i = 0; i  < distance_to_preys.size(); i++) {
-                    if (distance_to_preys[i] < distance_to_hunters[i]) {
+                    if (distance_to_preys[i] <= distance_to_hunters[i]) {
                         if (distance_to_preys[i] < distance_closest_prey) {
                             idx_closest_prey = i;
                             distance_closest_prey = distance_to_preys[i];
                         }
                     }
+                    else{
+                        idx_closest_hunter = i;
+                        distance_closest_hunter = distance_to_hunters[i];
+                    }
                 }
 
                 //STEP 2: define how I want to move
                 float dx = 0.2;
-                float angle = angle_to_preys[idx_closest_prey];
+                float angle = M_PI/30;
+                if(distance_closest_prey <= distance_closest_hunter){
+                    angle = angle_to_preys[idx_closest_prey];
+                }
+                else{
+                    angle = angle - angle_to_hunters[idx_closest_hunter];
+                }
+//                float angle = angle_to_preys[idx_closest_prey];
 
 
                 //STEP 2.5: check values
