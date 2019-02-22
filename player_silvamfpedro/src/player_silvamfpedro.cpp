@@ -154,8 +154,15 @@ namespace rws_silvamfpedro {
                 }
 
                 //STEP 2: define how I want to move
-                float dx = 1.25;
-                float angle = M_PI/6;
+                float dx = 0.2;
+                float angle = M_PI/16;
+
+                //STEP 2.5: check values
+                float dx_max = msg->cheetah;
+                dx > dx_max ? dx = dx_max : dx = dx;
+
+                double angle_max = M_PI/30;
+                fabs(angle) > fabs(angle_max) ? angle = angle_max*angle/fabs(angle) : angle = angle;
 
                 //STEP 3: define local movement
                 tf::Transform T1;
