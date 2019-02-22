@@ -238,7 +238,7 @@ namespace rws_silvamfpedro {
 //                marker.pose.orientation.w = 1.0;
                 marker.scale.x = 1;
                 marker.scale.y = 0.1;
-                marker.scale.z = 0.2;
+                marker.scale.z = 0.6;
                 marker.color.a = 1.0; // Don't forget to set the alpha!
                 marker.color.r = 0.0;
                 marker.color.g = 1.0;
