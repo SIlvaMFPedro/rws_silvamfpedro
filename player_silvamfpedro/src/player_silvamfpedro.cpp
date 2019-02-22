@@ -4,7 +4,7 @@
 #include <rws2019_msgs/MakeAPlay.h>
 #include <tf/transform_listener.h>
 #include <tf/transform_broadcaster.h>
-
+#include <visualization_msgs/Marker.h>
 
 using namespace std;
 using namespace boost;
@@ -97,6 +97,10 @@ namespace rws_silvamfpedro {
                 team_red = (boost::shared_ptr<Team>) new Team("red");
                 team_blue = (boost::shared_ptr<Team>) new Team("blue");
                 team_green = (boost::shared_ptr<Team>) new Team("green");
+
+                NodeHandle n;
+                vis_pub = (boost::shared_ptr<Publisher>) new Publisher;
+                (*vis_pub) = n.advertise<visualization_msgs::Marker>("player_names", 0);
                 //create hunter teams
                 if (team_red->playerBelongsToTeam(player_name)){
                     team_mine = team_red;
@@ -174,6 +178,32 @@ namespace rws_silvamfpedro {
                 //STEP 4: define global movement
                 tf::Transform Tglobal = T0*T1;
                 tb.sendTransform(tf::StampedTransform(Tglobal, ros::Time::now(), "world", this->getPlayerName()));
+
+                visualization_msgs::Marker marker;
+                marker.header.frame_id = this->getPlayerName();
+                marker.header.stamp = ros::Time();
+                marker.ns = this->getPlayerName();
+                marker.id = 0;
+                marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+                marker.action = visualization_msgs::Marker::ADD;
+//                marker.pose.position.x = 1;
+//                marker.pose.position.y = 1;
+//                marker.pose.position.z = 1;
+//                marker.pose.orientation.x = 0.0;
+//                marker.pose.orientation.y = 0.0;
+//                marker.pose.orientation.z = 0.0;
+//                marker.pose.orientation.w = 1.0;
+                marker.scale.x = 1;
+                marker.scale.y = 0.1;
+                marker.scale.z = 0.2;
+                marker.color.a = 1.0; // Don't forget to set the alpha!
+                marker.color.r = 0.0;
+                marker.color.g = 1.0;
+                marker.color.b = 0.0;
+                marker.text = this->getPlayerName();
+                //only if using a MESH_RESOURCE marker type:
+                //marker.mesh_resource = "package://pr2_description/meshes/base_v0/base.dae";
+                vis_pub->publish( marker );
             }
 
         private:
@@ -186,7 +216,7 @@ namespace rws_silvamfpedro {
             boost::shared_ptr<Team> team_preys;
             tf::TransformBroadcaster tb;
             tf::TransformListener tl;
-            tf::Transform transform;
+            boost::shared_ptr<Publisher> vis_pub;
     };
 
 
