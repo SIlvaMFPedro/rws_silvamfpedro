@@ -300,9 +300,9 @@ namespace rws_silvamfpedro {
                 vis_pub->publish( marker );
 
                 visualization_msgs::Marker bocas_marker;
-                bocas_marker.header.frame_id = this->getName();
+                bocas_marker.header.frame_id = this->getPlayerName();
                 bocas_marker.header.stamp = ros::Time();
-                bocas_marker.ns = this->getName();
+                bocas_marker.ns = this->getPlayerName();
                 bocas_marker.id = 0;
                 bocas_marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
                 bocas_marker.action = visualization_msgs::Marker::ADD;
