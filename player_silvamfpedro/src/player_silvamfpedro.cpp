@@ -10,14 +10,8 @@ using namespace std;
 using namespace boost;
 using namespace ros;
 
-float randomizePosition1()
-{
-    srand(6526*time(NULL)); // set initial seed value to 5323
-    return (((double)rand() / (RAND_MAX)) - 0.5) * 10;
-}
-float randomizePosition2()
-{
-    srand(3213*time(NULL)); // set initial seed value to 5323
+float randomize_Position(int n){
+    srand(n*time(NULL)); // set initial seed value to 5323
     return (((double)rand() / (RAND_MAX)) - 0.5) * 10;
 }
 
@@ -110,7 +104,7 @@ namespace rws_silvamfpedro {
                 vis_pub = (boost::shared_ptr<Publisher>) new Publisher;
                 (*vis_pub) = n.advertise<visualization_msgs::Marker>("player_names", 0);
                 bocas_pub = (boost::shared_ptr<ros::Publisher>) new ros::Publisher;
-                *bocas_pub = n.advertise<visualization_msgs::Marker>("bocas", 0);
+                (*bocas_pub) = n.advertise<visualization_msgs::Marker>("bocas", 0);
                 //create hunter teams
                 if (team_red->playerBelongsToTeam(player_name)){
                     team_mine = team_red;
@@ -134,8 +128,8 @@ namespace rws_silvamfpedro {
                 //printInfo();
 
                 //define intial position
-                float sx = randomizePosition1();
-                float sy = randomizePosition2();
+                float sx = randomize_Position(6526);
+                float sy = randomize_Position(3213);
                 tf::Transform T1;
                 T1.setOrigin( tf::Vector3(sx/2, sy/2, 0.0) );
                 tf::Quaternion q;
@@ -211,18 +205,39 @@ namespace rws_silvamfpedro {
 
                 //Compute closest prey and closest hunter;
                 int idx_closest_prey = 0;
+                int idx_closest_hunter = 0;
                 float distance_closest_prey = 1000;
+                float distance_closest_hunter = 1000;
+                //Compute closest prey
                 for(size_t i = 0; i  < distance_to_preys.size(); i++) {
                     if (distance_to_preys[i] < distance_closest_prey) {
-                            idx_closest_prey = i;
-                            distance_closest_prey = distance_to_preys[i];
+                        idx_closest_prey = i;
+                        distance_closest_prey = distance_to_preys[i];
+                    }
+                }
+                //Compute closest hunter
+                for(size_t i = 0; i < distance_to_hunters.size(); i++){
+                    if (distance_to_hunters[i] < distance_closest_hunter){
+                        idx_closest_hunter = i;
+                        distance_closest_hunter = distance_to_hunters[i];
                     }
                 }
 
                 //STEP 2: define how I want to move
                 float dx = 10;
                 float angle = angle_to_preys[idx_closest_prey];
+                float angle_hunter = angle_to_hunters[idx_closest_hunter];
+                //Compare prey and hunter distance
+                if(distance_closest_hunter < distance_closest_prey){
+                    //angle = -angle_hunter;
+                    angle = -angle_to_hunters[idx_closest_prey];
+                }
+                else{
+                    angle = angle_to_preys[idx_closest_prey];
+                }
                 string prey = team_preys->getPlayerNames().at(idx_closest_prey);
+                string hunter = team_hunters->getPlayerNames().at(idx_closest_hunter);
+                string boca = "I'm coming for you " + prey + " and i am running away from " + hunter;
 
                 float distance_to_arena_center;
                 float angle_to_arena_center;
@@ -283,6 +298,23 @@ namespace rws_silvamfpedro {
                 //only if using a MESH_RESOURCE marker type:
                 //marker.mesh_resource = "package://pr2_description/meshes/base_v0/base.dae";
                 vis_pub->publish( marker );
+
+                visualization_msgs::Marker bocas_marker;
+                bocas_marker.header.frame_id = this->getName();
+                bocas_marker.header.stamp = ros::Time();
+                bocas_marker.ns = this->getName();
+                bocas_marker.id = 0;
+                bocas_marker.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
+                bocas_marker.action = visualization_msgs::Marker::ADD;
+                bocas_marker.scale.z = 0.4;
+                bocas_marker.color.a = 1.0; // Don't forget to set the alpha!
+                bocas_marker.pose.position.y = 0.4;
+                bocas_marker.color.r = 0.0;
+                bocas_marker.color.g = 0.0;
+                bocas_marker.color.b = 0.0;
+                bocas_marker.text = boca;
+
+                bocas_pub->publish( bocas_marker );
             }
 
         private:
